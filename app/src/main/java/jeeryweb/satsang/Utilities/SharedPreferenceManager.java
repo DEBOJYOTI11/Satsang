@@ -22,6 +22,8 @@ public class SharedPreferenceManager {
     private static final String AlarmDisabled = "AlarmDisabled";
 
     private static final String Morning15 = "Morning_pray_time15";
+    private static  final  String AlarmTuneNameMorning = "AlarmTuneNameMorning";
+    private static  final  String AlarmTuneNameEvening = "AlarmTuneNameEvening";
 
 
 
@@ -67,6 +69,30 @@ public class SharedPreferenceManager {
         return pref.getString(Pray_Time, "NA");
     }
 
+
+    //alarm tune purposes
+
+    public void SaveMorningTune(String path)
+    {
+        editor.putString(AlarmTuneNameMorning, path);
+        editor.commit();
+    }
+    public String getMorningAlarmTune()
+    {
+        return pref.getString(AlarmTuneNameMorning, "NA");
+    }
+
+    public void SaveEveningTune(String path)
+    {
+        editor.putString(AlarmTuneNameEvening, path);
+        editor.commit();
+    }
+    public String getEveningAlarmTune()
+    {
+        return pref.getString(AlarmTuneNameEvening, "NA");
+    }
+
+
     //For alarm purposes
 
     //1 = morning
@@ -91,7 +117,7 @@ public class SharedPreferenceManager {
     }
 
     public Boolean isALarmDisabled(){
-        return pref.getBoolean(AlarmDisabled, true);
+        return pref.getBoolean(AlarmDisabled, false);
     }
 
 

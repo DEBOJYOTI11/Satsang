@@ -4,43 +4,45 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/satsang_trans"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/satsang_trans"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-      
-        <activity android:name=".Actvities.MainActivity"
-                  android:theme="@style/SplashTheme">
+        <activity
+            android:name=".Actvities.MainActivity"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".Actvities.AlarmActivity"
+            android:theme="@style/SplashTheme" />
+
         <service android:name=".Services.LocationUpdaterService" />
         <service
             android:name=".Services.FetchAddressIntentService"
             android:exported="false" />
 
         <receiver android:name=".Services.ServiceRestarterBraodcastReciever">
-
             <intent-filter>
-                <action android:name="com.jerryweb.restartService">
-                </action>
+                <action android:name="com.jerryweb.restartService" />
             </intent-filter>
-
-
         </receiver>
+        <receiver
+            android:name=".Services.AlarmBroadcastReciever"
+            android:enabled="true"
+            android:process=":remote" />
 
-
-        <receiver android:name="jeeryweb.satsang.Services.AlarmBroadcastReciever" android:process=":remote" android:enabled="true">
-        </receiver>
-
-
+        <activity android:name=".Actvities.alarmTunePicker" />
+        <activity android:name=".Actvities.SearchActivity"></activity>
     </application>
 
 </manifest>

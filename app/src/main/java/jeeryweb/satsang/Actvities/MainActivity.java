@@ -19,6 +19,9 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
@@ -63,7 +66,8 @@ public class MainActivity extends AppCompatActivity {
      * Tracks whether the user has requested an address. Becomes true when the user requests an
      * address and false when the address (or an error message) is delivered.
      */
-    private boolean mAddressRequested;
+    private boolean mAddressRequested= true;
+    private String mCountryName;
     private String mAddressOutput;
     private String mAddressState;
     private String mPrayingTime;
@@ -76,14 +80,14 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar mProgressBar;
     private Switch disableSwitch;
 
-    private TextView alarmSetConfirmer ,alarmSetConfirmer15;
-
+    private TextView alarmSetConfirmer;
 
     //Methods*******************************************************************************************
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+      ;
 
         mResultReceiver = new AddressResultReceiver(new Handler());
 
@@ -93,8 +97,7 @@ public class MainActivity extends AppCompatActivity {
 
         disableSwitch = (Switch) findViewById(R.id.simpleSwitch);
 
-        alarmSetConfirmer = (TextView) findViewById(R.id.alarm_debug_info_curr);
-        alarmSetConfirmer15 = (TextView) findViewById(R.id.alarm_debug_info_15);
+        alarmSetConfirmer = (TextView) findViewById(R.id.alarm_Set_confirmer);
 
         /*  Initilaize classed */
         fileReader = new FileReader();
@@ -108,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
         //set listener for swicth button
 
         disableSwitch.setChecked(sharedPref.isALarmDisabled());
+
         updateAlarmDisplaViews();
         disableSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -122,8 +126,8 @@ public class MainActivity extends AppCompatActivity {
 
                     //calling functions to cancel existing larms
                     try {
-                        alarmSetter.setAlarm15(false);
                         alarmSetter.setAlarm(false);
+                        alarmSetter.setAlarm15(false);
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
@@ -152,13 +156,37 @@ public class MainActivity extends AppCompatActivity {
 
         c = this;
         // Set defaults, then update using values stored in the Bundle.
-        mAddressRequested = false;
+
         mAddressOutput = "";
 
         updateAlarmDisplaViews();
         updateValuesFromBundle(savedInstanceState);
 
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        //  preparation code here
+        return super.onPrepareOptionsMenu(menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.courses) {
+            startActivity(new Intent(this, SearchActivity.class));
+        }
+        if (item.getItemId() == R.id.scores) {
+            startActivity(new Intent(this, SearchActivity.class));
+        }
+        if (item.getItemId() == R.id.handicap) {
+            startActivity(new Intent(this, SearchActivity.class));
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private boolean isServiceRunning(Class<?> serviceClass) {
@@ -189,6 +217,8 @@ public class MainActivity extends AppCompatActivity {
         unregisterReceiver(mrecievrfromService);
         super.onDestroy();
     }
+
+
 
 
 
@@ -229,12 +259,11 @@ public class MainActivity extends AppCompatActivity {
                         // If the user pressed the fetch address button before we had the location,
                         // this will be set to true indicating that we should kick off the intent
                         // service after fetching the location.
-                        if (mAddressRequested) {
+                        if(mLastLocation!=null)
                             startIntentService();
-                        } else {
-                            startIntentService();
-                            Log.e(TAG, "address not requested");
-                        }
+                        else
+                            showSnackbar("Cannot get location! Please try again later");
+
                     }
                 })
                 .addOnFailureListener(this, new OnFailureListener() {
@@ -251,19 +280,24 @@ public class MainActivity extends AppCompatActivity {
      */
     private void displayAddressOutput() {
 
-        if(mAddressOutput==null){
-            mLocationAddressTextView.setText("Error in App. Please restart!");
-            mStateNameView.setText("Error in App. Please restart!");
-            mPrayerTimeView.setText("Error in App. Please restart!");
+
+        if(mAddressOutput==null || mCountryName==null){
+            mLocationAddressTextView.setText("Cannot get your location!");
+            mStateNameView.setText("Cannot get your location!");
+            mPrayerTimeView.setText("Cannot get your location!");
             return;
         }
+
+
         mLocationAddressTextView.setText(mAddressOutput);
 
         if(mAddressState==null || mAddressState.equals("NA")){
             mStateNameView.setText("No Satasang mandir in your area");
+            mPrayerTimeView.setText("");
+            return;
         }
         else{
-            mStateNameView.setText(mAddressState);
+            mStateNameView.setText(mAddressState + ",\n"+ mCountryName);
         }
 
         String format[] = mPrayingTime.split(",");
@@ -271,36 +305,35 @@ public class MainActivity extends AppCompatActivity {
         mPrayerTimeView.setText(op);
     }
 
-
     //update alarm display views
     public void updateAlarmDisplaViews(){
 
+        alarmSetConfirmer.setText("");
+
         if (sharedPref.isALarmDisabled()) {
-            alarmSetConfirmer.setText("Alarm Disabled");
-            alarmSetConfirmer15.setText("Alarm Disabled");
+            alarmSetConfirmer.setText("Alarms Disabled");
+
             return;
         }
-        if(sharedPref.getflagA()==0)
-            alarmSetConfirmer.setText("Alarm Not set");
+        if(sharedPref.getflagA()==0 && sharedPref.getflagA15()==0){
+            alarmSetConfirmer.setText("Alarms not set");
+        }
 
-        if(sharedPref.getflagA()==1)
-            alarmSetConfirmer.setText("Morning Praying Time Alarm Set");
 
-        if(sharedPref.getflagA()==2)
-                alarmSetConfirmer.setText("Evening Praying Time Alarm Set");
+        if(sharedPref.getflagA()==1 &&  sharedPref.getflagA15()==1)
+            alarmSetConfirmer.setText("2 Alarms set at Morning prayer time and 15 minutes prior Morning prayer time");
 
-        if(sharedPref.getflagA15()==0)
-            alarmSetConfirmer15.setText("15 Minutes before reminder Not set");
+        if(sharedPref.getflagA()==2 &&  sharedPref.getflagA15()==2)
+            alarmSetConfirmer.setText("2 Alarms set at Evening prayer time and 15 minutes prior Evening prayer time");
 
-        if(sharedPref.getflagA15()==1)
-            alarmSetConfirmer15.setText("15 minutes before Morning Praying Reminder Set");
+        if(sharedPref.getflagA()==2 &&  sharedPref.getflagA15()==1)
+            alarmSetConfirmer.setText("2 Alarms set at Evening prayer time and 15 minutes prior to Morning prayer time");
 
-        if(sharedPref.getflagA15()==2)
-            alarmSetConfirmer15.setText("15 minutes before Evening Praying Reminder Set");
+        if(sharedPref.getflagA()==1 &&  sharedPref.getflagA15()==2)
+            alarmSetConfirmer.setText("2 Alarms set at Morning prayer time and 15 minutes prior to Evening prayer time");
 
 
     }
-
 
 
     /**
@@ -431,10 +464,19 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+    public void startActivityforTunePicker(View view){
+        Intent intent = new Intent(this, alarmTunePicker.class);
+
+        startActivity(intent);
+    }
+    public void startActivityforSearch(View view){
+        Intent intent = new Intent(this, SearchActivity.class);
+        startActivity(intent);
+    }
 
     /* class for recieving data from Location updater Service
 
-     */
+    */
     public class mRecievrfromService extends BroadcastReceiver {
 
 
@@ -461,8 +503,6 @@ public class MainActivity extends AppCompatActivity {
                 mAddressState = null;
                 Log.e("LocationUpdaterService", "Broadcast reciever did not work");
             }
-
-
         }
 
     }
@@ -481,23 +521,32 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
 
-            // Display the address string or an error message sent from the intent service.
-            mAddressOutput = resultData.getString(ConstantsForGeocoding.RESULT_DATA_KEY);
-            Log.e(TAG + ":::", "val " + mAddressOutput);
 
+            mAddressOutput = resultData.getString(ConstantsForGeocoding.RESULT_DATA_KEY);
+            mCountryName = resultData.getString(ConstantsForGeocoding.RESULT_DATA_KEY_COUNTRY);
+
+            Log.e(TAG + ":::", "Output from geocoder " + mAddressOutput + " "+ mCountryName);
+
+            if(mCountryName==null){
+                displayAddressOutput();
+                //return;
+            }
             if (mAddressOutput == null || mAddressOutput.equals("NA")) {
-                //displayAddressOutput();
-                resetAlarms();
+                displayAddressOutput();
+                //resetAlarms();
+
                 return;
             }
+
             fileReader.read1(c);
             fileReader.read2(c);
 
             mAddressState = fileReader.queryWithDistrict(mAddressOutput);
-            Log.e(TAG, "val " + mAddressState);
+            Log.e(TAG, "StateName  " + mAddressState);
+
             if (mAddressState == null || mAddressState.equals("NA")) {
-                //displayAddressOutput();
-                resetAlarms();
+                displayAddressOutput();
+                //resetAlarms();
                 return;
             }
 
@@ -507,10 +556,10 @@ public class MainActivity extends AppCompatActivity {
             Log.e(TAG, "val " + currentDate + " " + month);
 
             mPrayingTime = fileReader.queryWithState(mAddressState, month);
-            if (mPrayingTime == null || mPrayingTime=="NA") {
+            if (mPrayingTime == null || mPrayingTime.equals("NA")) {
                 mPrayingTime = "Error in Datase , We are fixing it!";
-                //displayAddressOutput();
-                resetAlarms();
+                displayAddressOutput();
+                //resetAlarms();
 
                 return;
             }
@@ -525,7 +574,7 @@ public class MainActivity extends AppCompatActivity {
 
                     try {
                         alarmSetter.setAlarm(false);
-                        alarmSetter.setAlarm(false);
+                        alarmSetter.setAlarm15(false);
                     } catch (ParseException e) {
                         Log.e(TAG, "error in alarmservice");
                         e.printStackTrace();
@@ -540,7 +589,6 @@ public class MainActivity extends AppCompatActivity {
             displayAddressOutput();
             updateAlarmDisplaViews();
             // Reset. Enable the Fetch Address button and stop showing the progress bar.
-            mAddressRequested = false;
 
 
         }
@@ -576,4 +624,3 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
-

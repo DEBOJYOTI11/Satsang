@@ -8,6 +8,6 @@
     <item>
         <bitmap
             android:gravity="center"
-            android:src="@drawable/satsang_trans"/>
+            android:src="@drawable/satsang_trans_splash"/>
     </item>
 </layer-list>

@@ -5,6 +5,8 @@
     <color name="colorAccent">#FF8F00</color>
     <color name="colorBack">#87cde0</color>
     <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBlack">#000000</color>
+
 
 
     <color name="colorLightGrayLine">#EDEDED</color>

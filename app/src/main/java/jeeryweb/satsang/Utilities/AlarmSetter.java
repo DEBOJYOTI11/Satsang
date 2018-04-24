@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,6 +26,7 @@ public class AlarmSetter {
     private PendingIntent alarmIntent;
     private int requestCode, requestCode15;
     public String AlarmFormat = "alarmformat";
+    private String currentDate;
 
 
     public AlarmSetter(Context c) {
@@ -41,9 +41,13 @@ public class AlarmSetter {
 
     public void setAlarm(Boolean cont) throws ParseException {
 
-
+        if(sharedPref.getPrayTime().equals("NA")){
+            sharedPref.setflagA(0);
+            return;
+        }
         Log.e(TAG, "SerAlarm() called");
 
+        //if alarm disabbled
         if (sharedPref.isALarmDisabled()) {
             if (sharedPref.getflagA() != 0) {   //flag a says morning evening or not set 120
                 cancelAlarm();
@@ -53,19 +57,21 @@ public class AlarmSetter {
             return;
         }
 
-
+        //if alarm not disaabled
         if (cont) {
 
             Log.e(TAG, "Contiious flag is set");
+            //morning alarm was set
             if (sharedPref.getflagA() == 1) { //morning alreadyset
                 Log.e(TAG, "Morning prayer ALarm was called");
 
                 String s = sharedPref.getPrayTime().split(",")[1];
                 int h = Integer.parseInt(s.split(":")[0]);
                 int m = Integer.parseInt(s.split(":")[1]);
+
                 long setTime;
                 Date d = new Date();
-                String currentDate = sdfDate.format(d);
+                currentDate = sdfDate.format(d);
 
                 String temp = currentDate + " " + h + ":" + m;
                 Date date = sdfDatePlusTime.parse(temp);
@@ -79,10 +85,10 @@ public class AlarmSetter {
                         setTime, alarmIntent);
 
                 sharedPref.setflagA(2); //now setting evening
-                Toast.makeText(_c, "Alarm set for your next Evening time prayer", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(_c, "Alarm set for your next Evening time prayer", Toast.LENGTH_SHORT).show();
                 Log.e(TAG, "Evening prayer alarm is being set!" + setTime);
 
-            } else { //evening already set
+            } else { //evening was set, now we will set morning
                 Log.e(TAG, "Evening prayer ALarm was called");
 
 
@@ -94,7 +100,7 @@ public class AlarmSetter {
 
 
                 Date d = new Date();
-                String currentDate = parseDate(d);
+                currentDate = parseDate(d);
                 String temp = currentDate + " " + h + ":" + m;
                 Date date = sdfDatePlusTime.parse(temp);
                 setTime = date.getTime();
@@ -108,10 +114,11 @@ public class AlarmSetter {
                         setTime, alarmIntent);
 
                 sharedPref.setflagA(1);  //now setting in morning
-                //  Toast.makeText(_c, "Alarm set for your next Morning time prayer",Toast.LENGTH_SHORT).show();
-                Toast.makeText(_c, "Alarm set for your next Morning time prayer", Toast.LENGTH_SHORT).show();
+
+               // Toast.makeText(_c, "Alarm set for your next Morning time prayer", Toast.LENGTH_SHORT).show();
                 Log.e(TAG, "Morning prayer alarm is being set!" + setTime);
             }
+            Log.e(TAG, "_______________________________");
             return;
         }
 
@@ -126,7 +133,8 @@ public class AlarmSetter {
         Boolean isCloserToMorning = IsCloserToMorning();
         Log.e(TAG, "isclosertoMornign is  "+isCloserToMorning);
         int h, m;
-        String currentDate;
+
+
         if (isCloserToMorning) {
             String s = sharedPref.getPrayTime().split(",")[0];
             h = Integer.parseInt(s.split(":")[0]);
@@ -139,7 +147,8 @@ public class AlarmSetter {
             Date d = new Date();
             SimpleDateFormat s_temp = new SimpleDateFormat("HH");
             int temp1 = Integer.parseInt(s_temp.format(d));  //get current hour
-            if(temp1 > h_temp){   //check if current hour is next day or presetn day
+
+            if(temp1 >= h_temp){   //check if current hour is next day or presetn day
                 Date d_temp  = new Date();
                 currentDate = parseDate(d_temp);
             }else{
@@ -150,7 +159,7 @@ public class AlarmSetter {
 
 
             sharedPref.setflagA(1);
-            Toast.makeText(_c, "Alarm set for your next Morning time Prayer",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(_c, "Alarm set for your next Morning time Prayer",Toast.LENGTH_SHORT).show();
             Log.e(TAG, "ALarm set for morning time");
         } else {
             String s = sharedPref.getPrayTime().split(",")[1];
@@ -159,7 +168,7 @@ public class AlarmSetter {
             Date d = new Date();
             currentDate = sdfDate.format(d);
             sharedPref.setflagA(2);
-            Toast.makeText(_c, "Alarm set for your next Evening time Prayer",Toast.LENGTH_SHORT).show();
+
             Log.e(TAG, "ALarm set for Evening time");
         }
 
@@ -197,6 +206,10 @@ public class AlarmSetter {
 
     public void setAlarm15(Boolean cont) throws ParseException {
 
+        if(sharedPref.getPrayTime().equals("NA")){
+            sharedPref.setflagA15(0);
+            return;
+        }
 
         Log.e(TAG, "SetAlarm15() function called");
         if (sharedPref.isALarmDisabled()) {
@@ -211,6 +224,7 @@ public class AlarmSetter {
         if (cont) {
             Log.e(TAG, "Contniuos is "+cont);
 
+            //mornng laram was set
             if (sharedPref.getflagA15() == 1) {
                 String s = sharedPref.getPrayTime().split(",")[1];
                 int h = Integer.parseInt(s.split(":")[0]);
@@ -233,7 +247,7 @@ public class AlarmSetter {
                 long setTime;
 
                 Date d = new Date();
-                String currentDate = sdfDate.format(d);
+                currentDate = sdfDate.format(d);
                 String temp = currentDate + " " + h + ":" + m;
 
                 Date date = sdfDatePlusTime.parse(temp);
@@ -246,8 +260,8 @@ public class AlarmSetter {
                  alarmMgr.set(AlarmManager.RTC_WAKEUP,
                         setTime, alarmIntent);
 
-                sharedPref.setflagA(2);
-                Toast.makeText(_c, "ALarm set for reminding you 15 mins early to your next Evening prayer",Toast.LENGTH_SHORT).show();
+                sharedPref.setflagA15(2);
+               // Toast.makeText(_c, "ALarm set for reminding you 15 mins early to your next Evening prayer",Toast.LENGTH_SHORT).show();
                 Log.e(TAG,  "15) Evening alarm is set at " + setTime);
             } else {
 
@@ -273,7 +287,7 @@ public class AlarmSetter {
 
 
                 Date d = new Date();
-                String currentDate = parseDate(d);
+                currentDate = parseDate(d);
                 String temp = currentDate + " " + h + ":" + m;
                 Date date = sdfDatePlusTime.parse(temp);
                 setTime = date.getTime();
@@ -285,10 +299,11 @@ public class AlarmSetter {
                 alarmMgr.set(AlarmManager.RTC_WAKEUP,
                         setTime, alarmIntent);
 
-                sharedPref.setflagA(1);
-                Toast.makeText(_c, "ALarm set for reminding you 15 mins early to your next Morning prayer",Toast.LENGTH_SHORT).show();
+                sharedPref.setflagA15(1);
+                //Toast.makeText(_c, "ALarm set for reminding you 15 mins early to your next Morning prayer",Toast.LENGTH_SHORT).show();
                 Log.e(TAG,  "15) Morning alarm is set at " + setTime);
             }
+            Log.e(TAG, " _______________________________________");
             return;
         }
 
@@ -302,7 +317,8 @@ public class AlarmSetter {
         Boolean isCloserToMorning = IsCloserToMorning15();
         Log.e(TAG, "15). isCLoserToMorning variable is "+isCloserToMorning);
         int h, m;
-        String currentDate;
+
+
         if (isCloserToMorning) {
             String s = sharedPref.getPrayTime().split(",")[0];
             h = Integer.parseInt(s.split(":")[0]);
@@ -339,11 +355,25 @@ public class AlarmSetter {
             }
 
             Date d = new Date();
+
             SimpleDateFormat s_temp = new SimpleDateFormat("HH:mm");
+
             String temp1 = s_temp.format(d);  //get current hour
             String temp2[] =  temp1.split(":");
             int curr_hour = Integer.parseInt(temp2[0]);
             int curr_min = Integer.parseInt(temp2[1]);
+
+            if(curr_hour==0 && curr_min<=15){
+                Date d_temp  = new Date();
+                currentDate = sdfDate.format(d_temp);
+
+            sharedPref.setflagA15(1);
+            // Toast.makeText(_c, "ALarm set for reminding you 15 mins early to your next Morning prayer",Toast.LENGTH_SHORT).show();
+            Log.e(TAG,  "15) Morning alarm is set");
+
+            }else{
+
+
 
             if (curr_min >= 15) {
                 curr_min = curr_min - 15;
@@ -360,18 +390,20 @@ public class AlarmSetter {
 
 
 
-            if(curr_hour > h_temp){   //check if current hour is next day or presetn day
+            if(curr_hour >= h_temp){   //check if current hour is next day or present day
                 Date d_temp= new Date();
                 currentDate =  parseDate(d_temp);
-            }else{
+            }
+            else{
 
                 Date d_temp  = new Date();
                 currentDate = sdfDate.format(d_temp);
             }
             sharedPref.setflagA15(1);
-            Toast.makeText(_c, "ALarm set for reminding you 15 mins early to your next Morning prayer",Toast.LENGTH_SHORT).show();
+           // Toast.makeText(_c, "ALarm set for reminding you 15 mins early to your next Morning prayer",Toast.LENGTH_SHORT).show();
             Log.e(TAG,  "15) Morning alarm is set");
-        } else {
+        }
+        }else {
             String s = sharedPref.getPrayTime().split(",")[1];
             h = Integer.parseInt(s.split(":")[0]);
             m = Integer.parseInt(s.split(":")[1]);
@@ -390,7 +422,7 @@ public class AlarmSetter {
             Date d = new Date();
             currentDate = sdfDate.format(d);
             sharedPref.setflagA15(2);
-            Toast.makeText(_c, "ALarm set for reminding you 15 mins early to your next Evening prayer",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(_c, "ALarm set for reminding you 15 mins early to your next Evening prayer",Toast.LENGTH_SHORT).show();
             Log.e(TAG,  "15) Evening alarm is set at ");
         }
 
@@ -434,8 +466,7 @@ public class AlarmSetter {
         int h2 = Integer.parseInt(s2.split(":")[0]);
         int m2 = Integer.parseInt(s2.split(":")[1]);
 
-        //Log.e(TAG, "isMorning called " + h + " " + h1 + " " + h2);
-
+        Log.e(TAG, "Ismorning called with para "+h+" "+h1+" "+h2);
         //compare with evening times
         if (h > h2)
             return true;
@@ -504,11 +535,7 @@ public class AlarmSetter {
                 h2 = h2 - 1;
             }
         }
-
-
-
-        //Log.e(TAG, "isMorning called " + h + " " + h1 + " " + h2);
-
+        Log.e(TAG, "Ismorning called with para "+h+" "+h1+" "+h2);
         //compare with evening times
         if (h > h2)
             return true;
@@ -556,9 +583,7 @@ public class AlarmSetter {
                 0);
 
         alarmManager.cancel(pendingIntent);
-
         Log.e(TAG, "15). Alarm is cancelled");
-
     }
 
 }

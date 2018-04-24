@@ -7,11 +7,9 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.ResultReceiver;
-import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -26,8 +24,9 @@ import jeeryweb.satsang.Utilities.ConstantsForGeocoding;
 public class FetchAddressIntentService extends IntentService{
 
 
-    private static final String TAG = "FetchAddressIS";
+    private static final String TAG = "MainActivity";
     String district;
+    String countryName;
 
     /**
      * The receiver where results are forwarded from this service.
@@ -60,7 +59,7 @@ public class FetchAddressIntentService extends IntentService{
 
         // Check if receiver was properly registered.
         if (mReceiver == null) {
-            Log.wtf(TAG, "No receiver received. There is nowhere to send the results.");
+            Log.e(TAG, "No receiver received. There is nowhere to send the results.");
             return;
         }
 
@@ -128,6 +127,7 @@ public class FetchAddressIntentService extends IntentService{
             for(int itr=0;itr<len;itr++) {
                 Log.e("addresses", String.valueOf(addresses.get(itr)));
                 district= addresses.get(itr).getSubAdminArea();
+                countryName = addresses.get(itr).getCountryName();
                 if(district!=null) {
                     Log.e("district", district);
                     break;
@@ -161,7 +161,13 @@ public class FetchAddressIntentService extends IntentService{
      */
     private void deliverResultToReceiver(int resultCode, String message) {
         Bundle bundle = new Bundle();
+        //mainoulate district
+
+        if(message.split(" ").length>=1)
+            message = message.split(" ")[0];
+
         bundle.putString(ConstantsForGeocoding.RESULT_DATA_KEY, message);
+        bundle.putString(ConstantsForGeocoding.RESULT_DATA_KEY_COUNTRY, countryName);
         mReceiver.send(resultCode, bundle);
     }
 }
