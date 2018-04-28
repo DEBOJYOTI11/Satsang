@@ -1,16 +1,19 @@
 package jeeryweb.satsang.Actvities;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
-import android.view.View.OnClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,35 +26,49 @@ public class SearchActivity extends AppCompatActivity {
     private Spinner spinnerZone,spinnerDistrict;
     private Button butt;
     FileReader fileReader;
+
+    WebView wv1;
+    ProgressDialog progressDialog;
     private final String Tag = SearchActivity.class.getSimpleName();
+    AlertDialog alertDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
         fileReader = new FileReader();
+        alertDialog = new AlertDialog.Builder(this).create();
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Loading... Please wait ");
 
-        spinnerZone = (Spinner) findViewById(R.id.spinner_zone);
-        spinnerDistrict = (Spinner) findViewById(R.id.spinner_district);
-        butt = (Button)findViewById(R.id.btnSubmit);
+        wv1=(WebView)findViewById(R.id.webview);
+        wv1.setWebViewClient(new MyBrowser());
+        wv1.getSettings().setLoadsImagesAutomatically(true);
+        wv1.getSettings().setJavaScriptEnabled(true);
+        wv1.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+        wv1.loadUrl(getString(R.string.url));
 
-        butt.setOnClickListener(new OnClickListener() {
+//        spinnerZone = (Spinner) findViewById(R.id.spinner_zone);
+//        spinnerDistrict = (Spinner) findViewById(R.id.spinner_district);
+//        butt = (Button)findViewById(R.id.btnSubmit);
 
-            @Override
-            public void onClick(View v) {
+//        butt.setOnClickListener(new OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//
+//                Toast.makeText(SearchActivity.this,
+//                        "OnClickListener : " +
+//                                "\nSpinner 1 : "+ String.valueOf(spinnerDistrict.getSelectedItem()) +
+//                                "\nSpinner 2 : "+ String.valueOf(spinnerZone.getSelectedItem()),
+//                        Toast.LENGTH_SHORT).show();
+//
+//                displayPrayingTimeofSelectedValues(String.valueOf(spinnerZone.getSelectedItem()),String.valueOf(spinnerDistrict.getSelectedItem()));
+//            }
+//
+//        });
 
-                Toast.makeText(SearchActivity.this,
-                        "OnClickListener : " +
-                                "\nSpinner 1 : "+ String.valueOf(spinnerDistrict.getSelectedItem()) +
-                                "\nSpinner 2 : "+ String.valueOf(spinnerZone.getSelectedItem()),
-                        Toast.LENGTH_SHORT).show();
-
-                displayPrayingTimeofSelectedValues(String.valueOf(spinnerZone.getSelectedItem()),String.valueOf(spinnerDistrict.getSelectedItem()));
-            }
-
-        });
-
-        addDataToSpinnerZone();
+        //addDataToSpinnerZone();
     }
     public void addDataToSpinnerZone(){
         fileReader.read1(this);
@@ -113,6 +130,39 @@ public class SearchActivity extends AppCompatActivity {
         @Override
         public void onNothingSelected(AdapterView<?> arg0) {
             // TODO Auto-generated method stub
+        }
+    }
+
+    //webview class
+
+    private class MyBrowser extends WebViewClient {
+
+        public  MyBrowser(){
+            progressDialog.show();
+        }
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            view.loadUrl(url);
+            return true;
+        }
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            // TODO Auto-generated method stub
+            super.onPageFinished(view, url);
+            if(progressDialog.isShowing())
+                progressDialog.hide();
+        }
+        public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+            if(progressDialog.isShowing())
+                progressDialog.hide();
+
+            Log.e(Tag, "Error: " + description);
+            Toast.makeText(SearchActivity.this, "Oh no! " + description, Toast.LENGTH_SHORT).show();
+
+            alertDialog.setTitle("Error! Check internet connection");
+            alertDialog.setMessage(description);
+
+            alertDialog.show();
         }
     }
 }

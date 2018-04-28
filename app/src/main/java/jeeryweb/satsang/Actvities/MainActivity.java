@@ -20,8 +20,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
@@ -59,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     public SharedPreferenceManager sharedPref;
     private mRecievrfromService mrecievrfromService;
     private Context c;
+
     //Location objects
     private FusedLocationProviderClient mFusedLocationClient;
     private Location mLastLocation;
@@ -79,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView mLocationAddressTextView, mStateNameView, mPrayerTimeView;
     private ProgressBar mProgressBar;
     private Switch disableSwitch;
-
     private TextView alarmSetConfirmer;
 
     //Methods*******************************************************************************************
@@ -87,16 +85,14 @@ public class MainActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-      ;
 
         mResultReceiver = new AddressResultReceiver(new Handler());
 
+        //widgets initialization
         mLocationAddressTextView = (TextView) findViewById(R.id.location_address_view);
         mStateNameView = (TextView) findViewById(R.id.location_state);
         mPrayerTimeView = (TextView) findViewById(R.id.prayer_time_view);
-
         disableSwitch = (Switch) findViewById(R.id.simpleSwitch);
-
         alarmSetConfirmer = (TextView) findViewById(R.id.alarm_Set_confirmer);
 
         /*  Initilaize classed */
@@ -165,28 +161,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-        return true;
-    }
     public boolean onPrepareOptionsMenu(Menu menu) {
         //  preparation code here
         return super.onPrepareOptionsMenu(menu);
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.courses) {
-            startActivity(new Intent(this, SearchActivity.class));
-        }
-        if (item.getItemId() == R.id.scores) {
-            startActivity(new Intent(this, SearchActivity.class));
-        }
-        if (item.getItemId() == R.id.handicap) {
-            startActivity(new Intent(this, SearchActivity.class));
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     private boolean isServiceRunning(Class<?> serviceClass) {
@@ -374,9 +351,17 @@ public class MainActivity extends AppCompatActivity {
      * Return the current state of the permissions needed.
      */
     private boolean checkPermissions() {
-        int permissionState = ActivityCompat.checkSelfPermission(this,
+        int permissionState1 = ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
-        return permissionState == PackageManager.PERMISSION_GRANTED;
+        int per2 = ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        int per3 = ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.MANAGE_DOCUMENTS);
+
+        return permissionState1 == PackageManager.PERMISSION_GRANTED &&
+                per2 == PackageManager.PERMISSION_GRANTED &&
+                per3 ==PackageManager.PERMISSION_GRANTED;
     }
 
 
@@ -385,7 +370,12 @@ public class MainActivity extends AppCompatActivity {
     private void requestPermissions() {
         boolean shouldProvideRationale =
                 ActivityCompat.shouldShowRequestPermissionRationale(this,
-                        Manifest.permission.ACCESS_FINE_LOCATION);
+                        Manifest.permission.ACCESS_FINE_LOCATION) &&
+                        ActivityCompat.shouldShowRequestPermissionRationale(this,
+                                Manifest.permission.READ_EXTERNAL_STORAGE) &&
+                        ActivityCompat.shouldShowRequestPermissionRationale(this,
+                                Manifest.permission.MANAGE_DOCUMENTS);
+
 
         // Provide an additional rationale to the user. This would happen if the user denied the
         // request previously, but didn't check the "Don't ask again" checkbox.
@@ -398,7 +388,8 @@ public class MainActivity extends AppCompatActivity {
                         public void onClick(View view) {
                             // Request permission
                             ActivityCompat.requestPermissions(MainActivity.this,
-                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_EXTERNAL_STORAGE , Manifest.permission.MEDIA_CONTENT_CONTROL,
+                                    Manifest.permission.MANAGE_DOCUMENTS},
                                     REQUEST_PERMISSIONS_REQUEST_CODE);
                         }
                     });
@@ -409,8 +400,8 @@ public class MainActivity extends AppCompatActivity {
             // sets the permission in a given state or the user denied the permission
             // previously and checked "Never ask again".
             ActivityCompat.requestPermissions(MainActivity.this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQUEST_PERMISSIONS_REQUEST_CODE);
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_EXTERNAL_STORAGE , Manifest.permission.MEDIA_CONTENT_CONTROL,
+                            Manifest.permission.MANAGE_DOCUMENTS}, REQUEST_PERMISSIONS_REQUEST_CODE);
         }
     }
 
@@ -470,7 +461,16 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
     public void startActivityforSearch(View view){
-        Intent intent = new Intent(this, SearchActivity.class);
+
+
+       Intent intent = new Intent(this, SearchActivity.class);
+       startActivity(intent);
+    }
+
+    public void startActivityforXXXX(View view){
+
+
+        Intent intent = new Intent(this, AlarmActivity.class);
         startActivity(intent);
     }
 

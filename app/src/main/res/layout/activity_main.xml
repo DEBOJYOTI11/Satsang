@@ -8,6 +8,7 @@
     android:orientation="vertical"
     tools:context=".Actvities.MainActivity">
 
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -36,6 +37,13 @@
             android:id="@+id/searchActivity"
             android:text="Search"
             android:onClick="startActivityforSearch" />
+
+        <Button
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_below="@+id/searchActivity"
+            android:text="just for debugging"
+            android:onClick="startActivityforXXXX" />
 
     </RelativeLayout>
     <LinearLayout

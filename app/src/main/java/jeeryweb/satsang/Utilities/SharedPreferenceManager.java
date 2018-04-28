@@ -92,6 +92,12 @@ public class SharedPreferenceManager {
         return pref.getString(AlarmTuneNameEvening, "NA");
     }
 
+    public void deleteMorningAlarmTune(){
+        editor.remove(AlarmTuneNameMorning).commit();
+    }
+    public void deleteEveningAlarmTune(){
+        editor.remove(AlarmTuneNameEvening).commit();
+    }
 
     //For alarm purposes
 
