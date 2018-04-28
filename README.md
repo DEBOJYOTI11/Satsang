@@ -8,10 +8,10 @@ Different Places have diffrent prayer timings.
 
 ### Features
 
-* Automical Detection of Location by abackground Location service.
+* Automically Detection of Location by a background Location service.
 * Use buidin android Geocoder to get Address from Lattitude and Longitide. 
 * Query a local database to get specific times at which alarm should be played.
-* using ALarmManager android class to set alarm cum notification at queried time.
+* Using ALarmManager android class to set alarm cum notification at queried time.
 * Pick up a alarm tune for local time system.
 
 
