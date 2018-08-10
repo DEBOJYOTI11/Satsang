@@ -6,6 +6,10 @@ Simple Notification generation app at prayer timings based on your location.
 Different Places have diffrent prayer timings.
 ```
 
+## Screenshots
+
+![Alt text](1.png?raw=true "Optional Title")
+![Alt text](2.png?raw=true "Optional Title")
 ### Features
 
 * Automically Detection of Location by a background Location service.
