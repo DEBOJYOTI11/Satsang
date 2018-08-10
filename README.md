@@ -8,7 +8,7 @@ Different Places have diffrent prayer timings.
 
 ## Screenshots
 
-![alt-text-1](1.png "title-1") ![alt-text-2](3.png "title-2")
+![alt-text-1](1.png "title-1") ![alt-text-2](2.png "title-2")
 ### Features
 
 * Automically Detection of Location by a background Location service.
